@@ -12,3 +12,9 @@ python src/fetch_articles.py
 ```
 
 Results land under `data/raw/<YYYY-MM-DD>/` with a `latest_timestamp.json` file keeping track of the most recent article fetched so incremental runs only pull fresh content.
+
+
+TODO:
+check flow if there is not timestamp
+check streaming, flow when one of api calls fails data should be saved
+

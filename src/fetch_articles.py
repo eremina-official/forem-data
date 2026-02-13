@@ -7,9 +7,9 @@ from typing import Any
 
 import requests
 
-API_URL = "https://dev.to/api/articles"
-PER_PAGE = 100
-STATE = "fresh"
+API_URL = "https://dev.to/api/articles/latest"
+PER_PAGE = 300
+# STATE = "fresh"
 DATA_DIR = Path("data/raw")
 LATEST_TIMESTAMP_FILE = Path("data/latest_timestamp.json")
 SLEEP_DELAY = 2
@@ -26,6 +26,7 @@ def load_latest_timestamp(path: Path) -> datetime | None:
     with path.open() as file_handle:
         latest_ts_str = json.load(file_handle).get("latest_timestamp")
         if latest_ts_str:
+            # maintain the timezone
             return datetime.fromisoformat(latest_ts_str)
     return None
 
@@ -40,7 +41,7 @@ def save_latest_timestamp(path: Path, timestamp: datetime | None) -> None:
 
 def fetch_page(page: int) -> list[dict[str, Any]]:
     """Fetch one page of articles with retry logic."""
-    params = {"per_page": PER_PAGE, "page": page, "state": STATE}
+    params = {"per_page": PER_PAGE, "page": page}
 
     # retry logic
     for attempt in range(1, MAX_RETRIES + 1):
@@ -74,6 +75,7 @@ def collect_new_articles(
 
     while True:
         articles = fetch_page(page)
+        logging.info(f"fetch {page} length:{len(articles)}")
         if not articles:
             break
 
@@ -90,7 +92,8 @@ def collect_new_articles(
                 continue
 
             if latest_timestamp and published_at <= latest_timestamp:
-                continue
+                logging.info("Reached already processed articles. Stopping.")
+                return new_articles, max_ts_seen, last_page_fetched
 
             new_articles.append(article)
             if not max_ts_seen or published_at > max_ts_seen:
@@ -133,10 +136,13 @@ def main() -> None:
         logging.info("No new articles found.")
         return
 
+    date = max_ts_seen.isoformat()
+    logging.info(f"Saving articles {date}")
+
     save_articles(new_articles, max_ts_seen, last_page_fetched)
 
 
 if __name__ == "__main__":
-    # one_hour_earlier = datetime.now(timezone.utc) - timedelta(hours=1)
+    # one_hour_earlier = datetime.now(timezone.utc) - timedelta(days=2)
     # save_latest_timestamp(LATEST_TIMESTAMP_FILE, one_hour_earlier)
     main()
