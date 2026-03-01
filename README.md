@@ -9,7 +9,7 @@ This project builds an **end-to-end Lakehouse pipeline (ELT)** to analyze techni
 - Which metrics impact engagement (reading time, sentiment, etc.)?
 
 **Data Overview:**
-- Total Articles Collected: Over 1,000,000 unique articles
+- Total Articles Collected: over 1 000 000 unique articles
 - Time Period: Historical backfill + daily incremental updates for period 01/2023-02/2026
 
 ---
@@ -31,7 +31,7 @@ Orchestration is handled by Azure Data Factory:
 **Extract**
 
 - Articles are fetched via Python scripts running in an **Azure Function App**.
-- Initial historical backfill is loaded once; subsequent loads capture only new articles.
+- Initial historical backfill is loaded once, subsequent loads capture only new articles.
 
 **Load**
 
@@ -71,6 +71,7 @@ Raw JSON is ingested as-is into Delta Lake without any transformations. This lay
 - No transformations or cleaning at this stage to maintain data integrity
 - Stored as Delta format (efficient querying, schema evolution, reduced storage costs)
 - Supports append-based incremental loads
+- Partitioned by year/month/day for efficient querying and management
 
 
 🥈 **Silver**
@@ -116,3 +117,17 @@ Analytical tables optimized for BI:
 - **Delta Lake** for storage: Provides ACID transactions, schema evolution and efficient querying.
 - **Modular Transformations**: Separate notebooks for each layer to maintain separation of concerns and facilitate maintenance.
 - **Power BI Optimization**: Gold tables designed for performance and ease of use in Power BI dashboards.
+
+---
+
+### Cost of Azure Services
+
+- **Azure Functions**: Pay-per-use model, costs depend on execution time and memory. Estimated cost for this project is minimal due to short execution times and infrequent runs (daily).
+
+- **Azure Blob Storage**: Costs based on storage volume and access patterns. With over 1 million articles, estimated storage costs are moderate, especially with infrequent access to raw data.
+
+- **Azure Databricks**: Costs depend on cluster size and runtime. **For this project cost of Databricks was highest among all services.**
+
+- **Azure Data Factory**: Costs based on pipeline runs and data movement. With daily runs, estimated costs are manageable, especially with efficient pipeline design to minimize unnecessary runs.
+
+- **Power BI**: Costs depend on the number of users and data refresh frequency.
