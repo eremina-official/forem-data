@@ -1,4 +1,4 @@
-## Forem ELT Project
+## Forem ELT Pipeline
 
 ### Project Goal
 
@@ -7,6 +7,10 @@ This project builds an **end-to-end Lakehouse pipeline (ELT)** to analyze techni
 - Which articles are more popular (beginner, tutorials, discussions)?
 - What keywords and tags trend over time?
 - Which metrics impact engagement (reading time, sentiment, etc.)?
+
+**Data Overview:**
+- Total Articles Collected: Over 1,000,000 unique articles
+- Time Period: Historical backfill + daily incremental updates for period 01/2023-02/2026
 
 ---
 
@@ -36,11 +40,12 @@ Orchestration is handled by Azure Data Factory:
 
 **Transform**
 
-Data transformations are implemented in **Databricks** using **PySpark**. Transformations are modularized into notebooks for each layer (Bronze, Silver, Gold) to maintain separation of concerns and facilitate maintenance.
+- Data transformations are implemented in **Databricks** using **PySpark**. 
+- Transformations are modularized into notebooks for each layer (Bronze, Silver, Gold) to maintain separation of concerns and facilitate maintenance.
 
 **Orchestration (Azure Data Factory)**
 
-- Triggers the Azure Function App for incremental article ingestion.
+- Azure Data Factory triggers the Azure Function App for incremental article ingestion.
 - Orchestrates Databricks notebooks for data transformations.
 - Ensures pipeline runs in a scheduled, automated and auditable way.
 
@@ -104,7 +109,10 @@ Analytical tables optimized for BI:
 
 ### Key Engineering Decisions
 
-- **Medallion Architecture**: Clear separation of raw, cleaned, and business-ready data layers for maintainability and scalability.
+- **Medallion Architecture**: Clear separation of raw, cleaned and business-ready data layers for maintainability and scalability.
 - **ELT Pattern**: Extract → Load → Transform, with raw data preserved for reproducibility and traceability.
 - **Incremental Loads**: Pipeline designed for efficiency; only new articles are processed daily.
-- Processed batches information is stored as metadata in the pipeline (`metadata` table) to ensure idempotency and prevent duplicates.
+- **Metadata** to keep track of processed batches (metadata is stored for the bronze and silver layer batches as separate table to ensure to keep track of processed data).
+- **Delta Lake** for storage: Provides ACID transactions, schema evolution and efficient querying.
+- **Modular Transformations**: Separate notebooks for each layer to maintain separation of concerns and facilitate maintenance.
+- **Power BI Optimization**: Gold tables designed for performance and ease of use in Power BI dashboards.
