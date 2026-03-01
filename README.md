@@ -1,4 +1,4 @@
-## Forem ELT
+## Forem ELT Project
 
 ### Project Goal
 
@@ -7,6 +7,8 @@ This project builds an **end-to-end Lakehouse pipeline (ELT)** to analyze techni
 - Which articles are more popular (beginner, tutorials, discussions)?
 - What keywords and tags trend over time?
 - Which metrics impact engagement (reading time, sentiment, etc.)?
+
+---
 
 ### Architecture
 
@@ -18,36 +20,41 @@ Orchestration is handled by Azure Data Factory:
 
 ![ADF Orchestration](assets/azure-data-factory.png)
 
+---
+
 ### Pipeline Description:
 
-1. **Extract**
+**Extract**
 
 - Articles are fetched via Python scripts running in an **Azure Function App**.
 - Initial historical backfill is loaded once; subsequent loads capture only new articles.
 
-2. **Load**
+**Load**
 
-- Raw JSON is stored directly in ***Azure Blob Storage***.
-- Processed data is stored in **Delta Lake** tables in Databricks, organized into Bronze, Silver, and Gold layers following the Medallion Architecture pattern.
+- Raw JSON is stored directly in **Azure Blob Storage**.
+- Processed data is stored in **Delta tables**, organized into Bronze, Silver and Gold layers following the Medallion Architecture pattern.
 
-3. **Transform**
+**Transform**
 
 Data transformations are implemented in **Databricks** using **PySpark**. Transformations are modularized into notebooks for each layer (Bronze, Silver, Gold) to maintain separation of concerns and facilitate maintenance.
 
-4. **Orchestration (Azure Data Factory)**
+**Orchestration (Azure Data Factory)**
 
 - Triggers the Azure Function App for incremental article ingestion.
-- Orchestrates Databricks notebooks for Silver and Gold transformations.
-- Ensures pipeline runs in a scheduled, automated, and auditable way.
+- Orchestrates Databricks notebooks for data transformations.
+- Ensures pipeline runs in a scheduled, automated and auditable way.
 
-5. **Analytics (Power BI)**
+**Analytics (Power BI)**
 
 Gold tables are used by Power BI dashboards for interactive exploration.
 
+---
 
 ### Data Layers
 
-**Data Source:** raw JSON data is fetched using **Forem REST API** `https://dev.to/api/articles/latest` and stored in **Azure Blob Storage**. Raw data is never modified or deleted to preserve the original state for traceability and reprocessing if needed.
+**Data Source** 
+
+Raw JSON data is fetched using **Forem REST API** `https://dev.to/api/articles/latest` and stored in **Azure Blob Storage**. Raw data is never modified or deleted to preserve the original state for traceability and reprocessing if needed.
 
 🥉 **Bronze**
 
@@ -93,6 +100,7 @@ Analytical tables optimized for BI:
 - Keep grain explicit and documented
 - Explode tags in Gold for easier analysis
 
+---
 
 ### Key Engineering Decisions
 
