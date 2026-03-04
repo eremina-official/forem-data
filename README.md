@@ -10,7 +10,7 @@ This project builds an **end-to-end Lakehouse pipeline (ELT)** to analyze techni
 
 **Data Overview:**
 - Total Articles Collected: over 1 000 000 unique articles
-- Time Period: Historical backfill + daily incremental updates, data span period 01/2023-01/2026
+- Time Period: Historical backfill + daily incremental updates, data span period 12/2022-01/2026
 
 ---
 
