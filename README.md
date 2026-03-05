@@ -131,4 +131,6 @@ Analytical tables optimized for BI. Main tables include:
 
 - **Azure Data Factory**: Costs based on pipeline runs and data movement. With daily runs, estimated costs are manageable, especially with efficient pipeline design to minimize unnecessary runs.
 
+- **Azure Key Vault**: Costs based on number of secrets and operations. For this project, costs were minimal.
+
 - **Power BI**: Costs depend on the number of users and data refresh frequency. For this projects, desktop version of Power BI is used, data were loaded to Power BI using Import Mode.
